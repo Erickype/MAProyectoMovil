@@ -35,41 +35,51 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Colors.red[400],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
-      body: ListView.separated(
-        itemCount: processes.length,
-        separatorBuilder: (BuildContext context, int index) => Divider(
-          height: 0,
-          color: Colors.black,
-        ),
-        itemBuilder: (BuildContext context, int index) {
-          return ListTile(
-            title: Text(
-              processes[index].processName,
-              style: TextStyle(
-                color: Theme.of(context).accentColor,
+      body: processes.length > 0
+          ? ListView.separated(
+              itemCount: processes.length,
+              separatorBuilder: (BuildContext context, int index) => Divider(
+                height: 0,
+                color: Colors.black,
+              ),
+              itemBuilder: (BuildContext context, int index) {
+                return ListTile(
+                  title: Text(
+                    processes[index].processName,
+                    style: TextStyle(
+                      color: Theme.of(context).accentColor,
+                    ),
+                  ),
+                  subtitle: Text(
+                      "Fecha creación ${formatDateTime(processes[index].processDate)}"),
+                  onTap: () {
+                    var args = {
+                      "user": User(userId: "", password: ""),
+                      "processId": processes[index].processId,
+                      "processName": processes[index].processName
+                    };
+
+                    Navigator.of(context)
+                        .pushNamed("/validateProcess", arguments: args)
+                        .then((value) async {
+                      processes = await widget._serverController
+                          .procesosCargo(widget.loggedUser.userId);
+                      if (!mounted) return;
+                      setState(() {});
+                    });
+                  },
+                );
+              },
+            )
+          : Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("No tienes procesos aún!!   ", style: TextStyle(fontSize: 18),),
+                  Icon(Icons.home_repair_service)
+                ],
               ),
             ),
-            subtitle: Text(
-                "Fecha creación ${formatDateTime(processes[index].processDate)}"),
-            onTap: () {
-              var args = {
-                "user": User(userId: "", password: ""),
-                "processId": processes[index].processId,
-                "processName": processes[index].processName
-              };
-
-              Navigator.of(context)
-                  .pushNamed("/validateProcess", arguments: args)
-                  .then((value) async {
-                processes = await widget._serverController
-                    .procesosCargo(widget.loggedUser.userId);
-                if (!mounted) return;
-                setState(() {});
-              });
-            },
-          );
-        },
-      ),
     );
   }
 
