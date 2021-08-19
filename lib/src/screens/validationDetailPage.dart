@@ -23,6 +23,7 @@ class _DetailPageState extends State<DetailPage> {
   String scanResult = "";
   late List<bool> _visibility = [];
   late List<TextEditingController> _textController = [];
+  late String _message;
 
   @override
   Widget build(BuildContext context) {
@@ -35,11 +36,15 @@ class _DetailPageState extends State<DetailPage> {
         backgroundColor: Theme.of(context).accentColor,
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          scanBarcode();
+        onPressed: () async{
+          await scanBarcode();
+         final snackbar = SnackBar(content: Text(_message));
+         ScaffoldMessenger.of(context).showSnackBar(snackbar); 
         },
+        
         child: Icon(Icons.camera_alt),
       ),
+      
       body: Column(
         children: [
           Expanded(
@@ -172,7 +177,7 @@ class _DetailPageState extends State<DetailPage> {
               ],
             ),
           )
-        ],
+     ],
       ),
     );
   }
@@ -212,8 +217,13 @@ class _DetailPageState extends State<DetailPage> {
 
     setState(() {
       for (var i = 0; i < processDetail.length; i++) {
-        if (processDetail[i].codigoBarras == scanResult) {
+        if (processDetail[i].codigoBarras == scanResult &&
+            processDetail[i].estadoActivo == "R") {
           processDetail[i].estadoActivo = "OK";
+          _message = processDetail[i].nombreActivo + " validado!";
+          break;
+        } else {
+          _message = processDetail[i].nombreActivo + " ya está validado!";
           break;
         }
       }
