@@ -94,6 +94,7 @@ class _LoginPageState extends State<LoginPage> {
                                   Theme.of(context).accentColor),
                             ),
                             onPressed: () {
+                              FocusScope.of(context).unfocus();
                               if (_formKey.currentState!.validate()) {
                                 _formKey.currentState!.save();
                                 _login(context);
